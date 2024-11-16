@@ -1,10 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import React, { useMemo, useRef } from "react";
+import {
+    Text,
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    Image,
+    TextInput,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../constants/Colors";
-import { TextInput } from "react-native-gesture-handler";
 import { Link } from "expo-router";
+import BottomSheetLocation from "./BottomSheetLocation";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+
+//  <Link href={"/(modal)/filter"} asChild></Link>
 
 const SearchBar = () => (
     <View style={styles.searchContainer}>
@@ -20,7 +30,7 @@ const SearchBar = () => (
                     placeholder="Resturant, groceries, dishes"
                 />
             </View>
-            <Link href={"/"} asChild>
+            <Link href="/(modal)/filter" asChild>
                 <TouchableOpacity style={styles.optionButton}>
                     <Ionicons
                         name="options-outline"
@@ -34,17 +44,28 @@ const SearchBar = () => (
 );
 
 const CustomHeader = () => {
+    const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+    const openModal = () => {
+        bottomSheetRef.current?.present();
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
+            <BottomSheetLocation ref={bottomSheetRef} />
+
             <View style={styles.container}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={openModal}>
                     <Image
                         style={styles.bike}
                         source={require("../assets/images/bike.png")}
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.titlesContainer}>
+                <TouchableOpacity
+                    style={styles.titlesContainer}
+                    onPress={openModal}
+                >
                     <Text style={styles.title}>Delivery . Now</Text>
                     <View style={styles.subtitleContainer}>
                         <Text style={styles.subtitle}>Selected location</Text>
@@ -109,23 +130,26 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
     },
+
     subtitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: "bold",
     },
 
     // For search bar
     searchContainer: {
-        height: 70,
+        height: 60,
         backgroundColor: "#fff",
         paddingHorizontal: 20,
     },
+
     searchSection: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        gap: 5,
+        gap: 20,
     },
+
     searchField: {
         flex: 1,
         flexDirection: "row",
@@ -136,12 +160,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 10,
     },
+
     input: {
         color: Colors.mediumDark,
     },
 
     optionButton: {
         borderRadius: 50,
+        padding: 10,
     },
 });
 
