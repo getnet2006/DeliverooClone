@@ -4,7 +4,7 @@ import { Stack, useNavigation } from "expo-router";
 import CustomHeader from "../components/CustomHeader";
 
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
@@ -61,6 +61,75 @@ export default function RootLayoutNav() {
                             >
                                 <Ionicons
                                     name="close-outline"
+                                    size={28}
+                                    color={Colors.primary}
+                                />
+                            </TouchableOpacity>
+                        ),
+                    }}
+                />
+                <Stack.Screen
+                    name="(modal)/dish"
+                    options={{
+                        presentation: "fullScreenModal",
+                        headerTitle: "",
+                        headerTransparent: true,
+                        headerLeft: () => (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.goBack();
+                                }}
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 20,
+                                    backgroundColor: "#fff",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Ionicons
+                                    name="close-outline"
+                                    size={28}
+                                    color={Colors.primary}
+                                />
+                            </TouchableOpacity>
+                        ),
+                    }}
+                />
+                <Stack.Screen
+                    name="basket"
+                    options={{
+                        presentation: "fullScreenModal",
+                        headerTitle: "Basket",
+                        headerTitleAlign: "center",
+                        headerRight: () => (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.goBack();
+                                }}
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 20,
+                                    backgroundColor: "#fff",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Text style={{ color: Colors.primary }}>
+                                    Edit
+                                </Text>
+                            </TouchableOpacity>
+                        ),
+                        headerLeft: () => (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.goBack();
+                                }}
+                            >
+                                <Ionicons
+                                    name="arrow-back-sharp"
                                     size={28}
                                     color={Colors.primary}
                                 />

@@ -20,6 +20,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
+import useBasketStore from "@/store/basketStore";
 
 const CardItem = ({ item, index }: any) => (
     <>
@@ -72,6 +73,7 @@ const Detail = () => {
     const itemsRef = useRef<TouchableOpacity[]>([]);
 
     const sectionListRef = useRef<SectionList<any>>(null);
+    const { items, total } = useBasketStore();
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -120,10 +122,27 @@ const Detail = () => {
 
     const selectCategory = (index: number) => {
         const selected = itemsRef.current[index];
-        setActiveIndex(index);
-        selected.measure((x: any) => {
-            scrollRef.current?.scrollTo({ x: x - 16, y: 0, animated: true });
-        });
+        if (selected) {
+            setActiveIndex(index);
+            requestAnimationFrame(() => {
+                selected.measure(
+                    (
+                        x: number,
+                        y: number,
+                        width: number,
+                        height: number,
+                        pageX: number,
+                        pageY: number
+                    ) => {
+                        scrollRef.current?.scrollTo({
+                            x: pageX + 16, // Use pageX for accurate positioning
+                            y: 0,
+                            animated: true,
+                        });
+                    }
+                );
+            });
+        }
     };
 
     // Function to scroll to the selected section
@@ -145,7 +164,11 @@ const Detail = () => {
     };
 
     const renderItem = ({ item, index }: any) => (
-        <Link href={"/"} asChild id={index}>
+        <Link
+            href={{ pathname: "/(modal)/dish", params: { id: item.id } }}
+            asChild
+            id={index}
+        >
             <TouchableOpacity style={styles.item}>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.dish}>{item.name}</Text>
@@ -219,7 +242,7 @@ const Detail = () => {
                         keyExtractor={(item, index) => `${item.id + index}`}
                         scrollEnabled={false}
                         sections={DATA}
-                        renderItem={CardItem}
+                        renderItem={renderItem}
                         ItemSeparatorComponent={() => (
                             <View
                                 style={{
@@ -255,6 +278,7 @@ const Detail = () => {
                             <TouchableOpacity
                                 key={index}
                                 ref={(ref) => (itemsRef.current[index] = ref!)}
+                                // ! check if ref is null
                                 style={
                                     activeIndex === index
                                         ? styles.activeCatSelectorTab
@@ -276,6 +300,25 @@ const Detail = () => {
                     </ScrollView>
                 </View>
             </Animated.View>
+            {/* Footer Basket */}
+            {items > 0 && (
+                <View style={styles.footer}>
+                    <SafeAreaView
+                        edges={["bottom"]}
+                        style={{ backgroundColor: "#fff" }}
+                    >
+                        <Link href="/basket" asChild>
+                            <TouchableOpacity style={styles.fullButton}>
+                                <Text style={styles.basket}>{items}</Text>
+                                <Text style={styles.footerText}>
+                                    View Basket
+                                </Text>
+                                <Text style={styles.basketTotal}>${total}</Text>
+                            </TouchableOpacity>
+                        </Link>
+                    </SafeAreaView>
+                </View>
+            )}
         </>
     );
 };
@@ -387,9 +430,9 @@ const styles = StyleSheet.create({
 
     segmentScrollview: {
         paddingHorizontal: 16,
+        paddingBottom: 4,
         alignItems: "center",
         gap: 20,
-        paddingBottom: 4,
     },
 
     catSelectorTab: {
@@ -411,6 +454,48 @@ const styles = StyleSheet.create({
     },
     activeCatText: {
         fontWeight: "bold",
+    },
+
+    footer: {
+        position: "absolute",
+        backgroundColor: "#fff",
+        bottom: 0,
+        left: 0,
+        width: "100%",
+        padding: 10,
+        elevation: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        paddingTop: 20,
+    },
+    fullButton: {
+        backgroundColor: Colors.primary,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        alignItems: "center",
+        flexDirection: "row",
+        flex: 1,
+        justifyContent: "space-between",
+        height: 50,
+    },
+    footerText: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 16,
+    },
+    basket: {
+        color: "#fff",
+        backgroundColor: "#19AA86",
+        fontWeight: "bold",
+        padding: 8,
+        borderRadius: 2,
+    },
+    basketTotal: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 16,
     },
 
     // section list
